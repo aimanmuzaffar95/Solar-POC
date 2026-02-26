@@ -1,13 +1,13 @@
 import React from 'react';
 import { useAuth } from '@/context/AuthContext';
-import type { UserRole, TeamAssignment } from '@/data/models';
+import type { UserRole } from '@/data/models';
 import { Sun } from 'lucide-react';
 
 const LoginPage: React.FC = () => {
   const { login } = useAuth();
 
-  const handleLogin = (role: UserRole, team?: TeamAssignment) => {
-    login(role, team);
+  const handleLogin = (role: UserRole) => {
+    login(role);
   };
 
   return (
@@ -22,8 +22,6 @@ const LoginPage: React.FC = () => {
         </div>
 
         <div className="bg-card rounded-xl border border-border p-6 shadow-card space-y-4">
-          <p className="text-sm font-medium text-foreground mb-4">Select your role to continue</p>
-
           <button
             onClick={() => handleLogin('admin')}
             className="w-full py-3 px-4 rounded-lg gradient-solar text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity glow-amber"
@@ -31,20 +29,6 @@ const LoginPage: React.FC = () => {
             Login as CEO / Admin
           </button>
 
-          <div className="relative py-2">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
-            <div className="relative flex justify-center"><span className="bg-card px-3 text-xs text-muted-foreground">or select installer team</span></div>
-          </div>
-
-          {(['Team 1', 'Team 2', 'Team 3'] as TeamAssignment[]).map(team => (
-            <button
-              key={team}
-              onClick={() => handleLogin('installer', team)}
-              className="w-full py-2.5 px-4 rounded-lg border border-border bg-secondary text-secondary-foreground text-sm font-medium hover:bg-accent transition-colors"
-            >
-              Login as Installer — {team}
-            </button>
-          ))}
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-4">POC — Mock Authentication</p>
