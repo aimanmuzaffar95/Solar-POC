@@ -32,6 +32,7 @@ export type TeamAssignment = 'Team 1' | 'Team 2' | 'Team 3';
 export type InvoiceStatus = 'not_invoiced' | 'invoiced' | 'paid';
 export type MeterType = 'pre_meter' | 'post_meter';
 export type MeterStatus = 'pending' | 'approved' | 'rejected';
+export type CustomerMeterStatus = MeterStatus | 'not_submitted';
 export type AlertType =
   | 'PRE_METER_PENDING_7_DAYS'
   | 'INSTALL_WITHIN_3_DAYS_PRE_METER_NOT_APPROVED'
@@ -47,6 +48,13 @@ export interface Customer {
   address: string;
   phone: string;
   email: string;
+  systemType?: SystemType;
+  contractSigned?: boolean;
+  depositPaid?: boolean;
+  depositAmount?: number;
+  installDate?: string | null;
+  preMeterStatus?: CustomerMeterStatus;
+  postMeterStatus?: CustomerMeterStatus;
 }
 
 export interface Job {

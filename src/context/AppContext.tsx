@@ -21,6 +21,7 @@ interface AppState {
   alerts: Alert[];
   overridePreMeter: boolean;
   setOverridePreMeter: (v: boolean) => void;
+  addCustomer: (customer: Customer) => void;
   updateJob: (id: string, updates: Partial<Job>) => void;
   moveJobStage: (jobId: string, newStage: PipelineStage, userId: string) => boolean;
   addNote: (note: Note) => void;
@@ -44,7 +45,7 @@ export const useAppData = () => useContext(AppContext);
 
 export const AppDataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [jobs, setJobs] = useState<Job[]>(seedJobs);
-  const [customers] = useState<Customer[]>(seedCustomers);
+  const [customers, setCustomers] = useState<Customer[]>(seedCustomers);
   const [meters, setMeters] = useState<MeterApplication[]>(seedMeters);
   const [notes, setNotes] = useState<Note[]>(seedNotes);
   const [comments, setComments] = useState<Comment[]>(seedComments);
@@ -52,6 +53,10 @@ export const AppDataProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [timeline, setTimeline] = useState<TimelineEvent[]>(seedTimeline);
   const [alerts, setAlerts] = useState<Alert[]>(seedAlerts);
   const [overridePreMeter, setOverridePreMeter] = useState(false);
+
+  const addCustomer = useCallback((customer: Customer) => {
+    setCustomers(prev => [...prev, customer]);
+  }, []);
 
   const updateJob = useCallback((id: string, updates: Partial<Job>) => {
     setJobs(prev => prev.map(j => j.id === id ? { ...j, ...updates } : j));
@@ -166,7 +171,7 @@ export const AppDataProvider: React.FC<{ children: React.ReactNode }> = ({ child
     <AppContext.Provider value={{
       jobs, customers, meters, notes, comments, files, timeline, alerts,
       overridePreMeter, setOverridePreMeter,
-      updateJob, moveJobStage, addNote, addComment, addFile, addTimelineEvent,
+      addCustomer, updateJob, moveJobStage, addNote, addComment, addFile, addTimelineEvent,
       updateMeter, resolveAlert, refreshAlerts, getCustomer,
       getJobMeters, getJobNotes, getJobComments, getJobFiles, getJobTimeline, getJobAlerts,
     }}>
