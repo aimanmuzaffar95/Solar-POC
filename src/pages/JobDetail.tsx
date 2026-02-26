@@ -19,6 +19,7 @@ const JobDetail: React.FC = () => {
   const [newNote, setNewNote] = useState('');
   const [newComment, setNewComment] = useState('');
   const [showStageDropdown, setShowStageDropdown] = useState(false);
+  const [showTeamDropdown, setShowTeamDropdown] = useState(false);
 
   const job = jobs.find(j => j.id === id);
   if (!job) return <div className="p-8 text-center text-muted-foreground">Job not found</div>;
@@ -74,6 +75,23 @@ const JobDetail: React.FC = () => {
     setShowStageDropdown(false);
   };
 
+  const handleTeamChange = (team: TeamAssignment) => {
+    if (team === job.assignedTeam) {
+      setShowTeamDropdown(false);
+      return;
+    }
+    updateJob(job.id, { assignedTeam: team });
+    addTimelineEvent({
+      id: `te_${Date.now()}`,
+      jobId: job.id,
+      eventType: 'assignment_change',
+      description: `Assigned to ${team}`,
+      createdAt: new Date().toISOString(),
+      createdBy: user?.name || '',
+    });
+    setShowTeamDropdown(false);
+  };
+
   const getSystemIcon = () => {
     if (job.systemType === 'solar') return <Sun className="w-4 h-4 text-solar-amber" />;
     if (job.systemType === 'battery') return <Battery className="w-4 h-4 text-solar-teal" />;
@@ -114,27 +132,57 @@ const JobDetail: React.FC = () => {
             </div>
           </div>
           {isAdmin && (
-            <div className="relative">
-              <button
-                onClick={() => setShowStageDropdown(!showStageDropdown)}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-colors"
-              >
-                {PIPELINE_STAGES.find(s => s.key === job.pipelineStage)?.label}
-                <ChevronDown className="w-3 h-3" />
-              </button>
-              {showStageDropdown && (
-                <div className="absolute right-0 top-full mt-1 w-48 bg-popover border border-border rounded-lg shadow-lg z-10 py-1">
-                  {PIPELINE_STAGES.map(s => (
-                    <button
-                      key={s.key}
-                      onClick={() => handleStageChange(s.key)}
-                      className={cn("w-full text-left px-3 py-1.5 text-xs hover:bg-muted transition-colors", s.key === job.pipelineStage && "text-primary font-medium")}
-                    >
-                      {s.label}
-                    </button>
-                  ))}
-                </div>
-              )}
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setShowTeamDropdown(false);
+                    setShowStageDropdown(!showStageDropdown);
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-colors"
+                >
+                  {PIPELINE_STAGES.find(s => s.key === job.pipelineStage)?.label}
+                  <ChevronDown className="w-3 h-3" />
+                </button>
+                {showStageDropdown && (
+                  <div className="absolute right-0 top-full mt-1 w-48 bg-popover border border-border rounded-lg shadow-lg z-10 py-1">
+                    {PIPELINE_STAGES.map(s => (
+                      <button
+                        key={s.key}
+                        onClick={() => handleStageChange(s.key)}
+                        className={cn("w-full text-left px-3 py-1.5 text-xs hover:bg-muted transition-colors", s.key === job.pipelineStage && "text-primary font-medium")}
+                      >
+                        {s.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setShowStageDropdown(false);
+                    setShowTeamDropdown(!showTeamDropdown);
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary text-secondary-foreground text-xs font-medium hover:bg-secondary/80 transition-colors"
+                >
+                  {job.assignedTeam}
+                  <ChevronDown className="w-3 h-3" />
+                </button>
+                {showTeamDropdown && (
+                  <div className="absolute right-0 top-full mt-1 w-32 bg-popover border border-border rounded-lg shadow-lg z-10 py-1">
+                    {(['Team 1', 'Team 2', 'Team 3'] as TeamAssignment[]).map(team => (
+                      <button
+                        key={team}
+                        onClick={() => handleTeamChange(team)}
+                        className={cn("w-full text-left px-3 py-1.5 text-xs hover:bg-muted transition-colors", team === job.assignedTeam && "text-primary font-medium")}
+                      >
+                        {team}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
