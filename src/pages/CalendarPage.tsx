@@ -3,20 +3,26 @@ import { useAppData } from '@/context/AppContext';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
-import type { TeamAssignment } from '@/data/models';
 
-const TEAMS: TeamAssignment[] = ['Team 1', 'Team 2', 'Team 3'];
 const MAX_JOBS_PER_TEAM_PER_DAY = 2;
-const TEAM_COLORS: Record<string, string> = {
-  'Team 1': 'bg-primary/20 border-primary/40 text-primary',
-  'Team 2': 'bg-solar-teal/20 border-solar-teal/40 text-solar-teal',
-  'Team 3': 'bg-solar-info/20 border-solar-info/40 text-solar-info',
+const TEAM_COLORS = [
+  'bg-primary/20 border-primary/40 text-primary',
+  'bg-solar-teal/20 border-solar-teal/40 text-solar-teal',
+  'bg-solar-info/20 border-solar-info/40 text-solar-info',
+  'bg-solar-success/20 border-solar-success/40 text-solar-success',
+  'bg-destructive/20 border-destructive/40 text-destructive',
+];
+
+const getTeamColor = (team: string, teams: string[]) => {
+  const index = teams.indexOf(team);
+  return TEAM_COLORS[(index >= 0 ? index : 0) % TEAM_COLORS.length];
 };
 
 const CalendarPage: React.FC = () => {
-  const { jobs, customers } = useAppData();
+  const { jobs, customers, teams } = useAppData();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
+  const teamList = teams.length > 0 ? teams : Array.from(new Set(jobs.map(j => j.assignedTeam)));
 
   const getWeekDays = (date: Date) => {
     const start = new Date(date);
@@ -95,9 +101,9 @@ const CalendarPage: React.FC = () => {
 
       {/* Team legend */}
       <div className="flex gap-3 flex-wrap">
-        {TEAMS.map(team => (
+        {teamList.map(team => (
           <div key={team} className="flex items-center gap-1.5">
-            <div className={cn("w-3 h-3 rounded-sm border", TEAM_COLORS[team])} />
+            <div className={cn("w-3 h-3 rounded-sm border", getTeamColor(team, teamList))} />
             <span className="text-xs text-muted-foreground">{team}</span>
           </div>
         ))}
@@ -117,7 +123,7 @@ const CalendarPage: React.FC = () => {
               countByTeam[j.assignedTeam] = (countByTeam[j.assignedTeam] || 0) + 1;
             });
             const totalKw = dayJobs.reduce((s, j) => s + j.systemSizeKw, 0);
-            const hasCapacityWarning = TEAMS.some(t => (countByTeam[t] || 0) > MAX_JOBS_PER_TEAM_PER_DAY);
+            const hasCapacityWarning = teamList.some(t => (countByTeam[t] || 0) > MAX_JOBS_PER_TEAM_PER_DAY);
 
             return (
               <div key={dateStr} className={cn(
@@ -146,7 +152,7 @@ const CalendarPage: React.FC = () => {
                         to={`/job/${job.id}`}
                         className={cn(
                           "block p-2 rounded-md border text-[10px] transition-all hover:shadow-card-hover",
-                          TEAM_COLORS[job.assignedTeam]
+                          getTeamColor(job.assignedTeam, teamList)
                         )}
                       >
                         <p className="font-semibold truncate">{customer?.name}</p>
@@ -187,7 +193,7 @@ const CalendarPage: React.FC = () => {
                         <Link
                           key={job.id}
                           to={`/job/${job.id}`}
-                          className={cn("block px-1 py-0.5 rounded text-[9px] truncate border", TEAM_COLORS[job.assignedTeam])}
+                          className={cn("block px-1 py-0.5 rounded text-[9px] truncate border", getTeamColor(job.assignedTeam, teamList))}
                         >
                           {customer?.name}
                         </Link>

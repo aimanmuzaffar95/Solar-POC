@@ -28,7 +28,7 @@ export const PIPELINE_STAGES: { key: PipelineStage; label: string }[] = [
 ];
 
 export type SystemType = 'solar' | 'battery' | 'both';
-export type TeamAssignment = 'Team 1' | 'Team 2' | 'Team 3';
+export type TeamAssignment = string;
 export type InvoiceStatus = 'not_invoiced' | 'invoiced' | 'paid';
 export type MeterType = 'pre_meter' | 'post_meter';
 export type MeterStatus = 'pending' | 'approved' | 'rejected';

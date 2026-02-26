@@ -1,17 +1,19 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import type {
   Job, Customer, MeterApplication, Note, Comment,
-  FileUpload, TimelineEvent, Alert, PipelineStage
+  FileUpload, TimelineEvent, Alert, PipelineStage, AppUser, TeamAssignment
 } from '@/data/models';
 import {
   jobs as seedJobs, customers as seedCustomers,
   meterApplications as seedMeters, notes as seedNotes,
   comments as seedComments, fileUploads as seedFiles,
-  timelineEvents as seedTimeline, alerts as seedAlerts
+  timelineEvents as seedTimeline, alerts as seedAlerts, users as seedUsers
 } from '@/data/seedData';
 
 interface AppState {
   jobs: Job[];
+  users: AppUser[];
+  teams: TeamAssignment[];
   customers: Customer[];
   meters: MeterApplication[];
   notes: Note[];
@@ -22,6 +24,9 @@ interface AppState {
   overridePreMeter: boolean;
   setOverridePreMeter: (v: boolean) => void;
   addCustomer: (customer: Customer) => void;
+  addTeam: (team: TeamAssignment) => void;
+  addTeamMember: (name: string, team?: TeamAssignment) => void;
+  updateUserTeam: (userId: string, team?: TeamAssignment) => void;
   updateJob: (id: string, updates: Partial<Job>) => void;
   moveJobStage: (jobId: string, newStage: PipelineStage, userId: string) => boolean;
   addNote: (note: Note) => void;
@@ -45,6 +50,15 @@ export const useAppData = () => useContext(AppContext);
 
 export const AppDataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [jobs, setJobs] = useState<Job[]>(seedJobs);
+  const [users, setUsers] = useState<AppUser[]>(seedUsers);
+  const [teams, setTeams] = useState<TeamAssignment[]>(() => {
+    const teamNames = new Set<TeamAssignment>();
+    seedJobs.forEach(job => teamNames.add(job.assignedTeam));
+    seedUsers.forEach(user => {
+      if (user.team) teamNames.add(user.team);
+    });
+    return Array.from(teamNames);
+  });
   const [customers, setCustomers] = useState<Customer[]>(seedCustomers);
   const [meters, setMeters] = useState<MeterApplication[]>(seedMeters);
   const [notes, setNotes] = useState<Note[]>(seedNotes);
@@ -56,6 +70,24 @@ export const AppDataProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const addCustomer = useCallback((customer: Customer) => {
     setCustomers(prev => [...prev, customer]);
+  }, []);
+
+  const addTeam = useCallback((team: TeamAssignment) => {
+    const name = team.trim();
+    if (!name) return;
+    setTeams(prev => prev.includes(name) ? prev : [...prev, name]);
+  }, []);
+
+  const addTeamMember = useCallback((name: string, team?: TeamAssignment) => {
+    const memberName = name.trim();
+    if (!memberName) return;
+    setUsers(prev => [...prev, { id: `u_${Date.now()}`, name: memberName, role: 'installer', team }]);
+    if (team) setTeams(prev => prev.includes(team) ? prev : [...prev, team]);
+  }, []);
+
+  const updateUserTeam = useCallback((userId: string, team?: TeamAssignment) => {
+    setUsers(prev => prev.map(u => u.id === userId ? { ...u, team } : u));
+    if (team) setTeams(prev => prev.includes(team) ? prev : [...prev, team]);
   }, []);
 
   const updateJob = useCallback((id: string, updates: Partial<Job>) => {
@@ -169,9 +201,9 @@ export const AppDataProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   return (
     <AppContext.Provider value={{
-      jobs, customers, meters, notes, comments, files, timeline, alerts,
+      jobs, users, teams, customers, meters, notes, comments, files, timeline, alerts,
       overridePreMeter, setOverridePreMeter,
-      addCustomer, updateJob, moveJobStage, addNote, addComment, addFile, addTimelineEvent,
+      addCustomer, addTeam, addTeamMember, updateUserTeam, updateJob, moveJobStage, addNote, addComment, addFile, addTimelineEvent,
       updateMeter, resolveAlert, refreshAlerts, getCustomer,
       getJobMeters, getJobNotes, getJobComments, getJobFiles, getJobTimeline, getJobAlerts,
     }}>

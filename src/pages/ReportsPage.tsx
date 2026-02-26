@@ -6,7 +6,7 @@ const COLORS = ['hsl(38, 92%, 50%)', 'hsl(175, 60%, 40%)', 'hsl(205, 85%, 55%)',
 type DateRange = '30' | '90' | '365';
 
 const ReportsPage: React.FC = () => {
-  const { jobs, customers } = useAppData();
+  const { jobs, customers, teams } = useAppData();
   const [range, setRange] = useState<DateRange>('90');
 
   const rangeStart = useMemo(() => {
@@ -39,11 +39,12 @@ const ReportsPage: React.FC = () => {
 
   // Team performance
   const teamPerf = useMemo(() => {
-    const teams: Record<string, number> = { 'Team 1': 0, 'Team 2': 0, 'Team 3': 0 };
+    const teamNames = Array.from(new Set([...teams, ...jobs.map(j => j.assignedTeam)]));
+    const counts: Record<string, number> = Object.fromEntries(teamNames.map(team => [team, 0]));
     jobs.filter(j => ['installed', 'completed', 'invoiced', 'paid'].includes(j.pipelineStage))
-      .forEach(j => { teams[j.assignedTeam] = (teams[j.assignedTeam] || 0) + 1; });
-    return Object.entries(teams).map(([team, count]) => ({ team, count }));
-  }, [jobs]);
+      .forEach(j => { counts[j.assignedTeam] = (counts[j.assignedTeam] || 0) + 1; });
+    return Object.entries(counts).map(([team, count]) => ({ team, count }));
+  }, [jobs, teams]);
 
   // Conversion rate
   const quotedCount = jobs.filter(j => j.pipelineStage !== 'lead').length;

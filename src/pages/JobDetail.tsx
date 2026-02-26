@@ -13,7 +13,7 @@ import {
 
 const JobDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { jobs, customers, getJobMeters, getJobNotes, getJobComments, getJobFiles, getJobTimeline, getJobAlerts, updateJob, updateMeter, addNote, addComment, addFile, addTimelineEvent, moveJobStage } = useAppData();
+  const { jobs, teams, customers, getJobMeters, getJobNotes, getJobComments, getJobFiles, getJobTimeline, getJobAlerts, updateJob, updateMeter, addNote, addComment, addFile, addTimelineEvent, moveJobStage } = useAppData();
   const { user, isAdmin } = useAuth();
 
   const [newNote, setNewNote] = useState('');
@@ -170,8 +170,8 @@ const JobDetail: React.FC = () => {
                   <ChevronDown className="w-3 h-3" />
                 </button>
                 {showTeamDropdown && (
-                  <div className="absolute right-0 top-full mt-1 w-32 bg-popover border border-border rounded-lg shadow-lg z-10 py-1">
-                    {(['Team 1', 'Team 2', 'Team 3'] as TeamAssignment[]).map(team => (
+                  <div className="absolute right-0 top-full mt-1 w-40 bg-popover border border-border rounded-lg shadow-lg z-10 py-1">
+                    {teams.map((team: TeamAssignment) => (
                       <button
                         key={team}
                         onClick={() => handleTeamChange(team)}

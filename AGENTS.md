@@ -2,7 +2,7 @@
 
 ## Project Architecture
 
-This project uses a frontend-only architecture built with Vite + React + TypeScript.
+This project uses a frontend-only architecture built with Vite + React + TypeScript. Currently this project is just UI with static data and does not have any backend connected.
 
 - Runtime: Client-side SPA (no backend server in this repository).
 - Build tool: Vite.

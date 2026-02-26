@@ -12,9 +12,9 @@ import Pipeline from "@/pages/Pipeline";
 import CalendarPage from "@/pages/CalendarPage";
 import JobDetail from "@/pages/JobDetail";
 import CustomersPage from "@/pages/CustomersPage";
+import TeamsPage from "@/pages/TeamsPage";
 import ReportsPage from "@/pages/ReportsPage";
 import SettingsPage from "@/pages/SettingsPage";
-import MobileInstallerView from "@/pages/MobileInstallerView";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,9 +33,9 @@ const AuthenticatedApp = () => {
           <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/job/:id" element={<JobDetail />} />
           <Route path="/customers" element={<CustomersPage />} />
+          <Route path="/teams" element={<TeamsPage />} />
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/mobile-view" element={<MobileInstallerView />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>

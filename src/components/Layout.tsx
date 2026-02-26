@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import {
   LayoutDashboard, Kanban, CalendarDays, Users, BarChart3,
-  Settings, LogOut, Menu, X, Sun, Smartphone, ChevronLeft
+  Settings, LogOut, Menu, Sun, ChevronLeft, UsersRound
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -12,6 +12,7 @@ const navItems = [
   { to: '/pipeline', label: 'Pipeline', icon: Kanban },
   { to: '/calendar', label: 'Calendar', icon: CalendarDays },
   { to: '/customers', label: 'Customers', icon: Users },
+  { to: '/teams', label: 'Teams', icon: UsersRound },
   { to: '/reports', label: 'Reports', icon: BarChart3 },
   { to: '/settings', label: 'Settings', icon: Settings },
 ];
@@ -71,20 +72,6 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             );
           })}
 
-          <Link
-            to="/mobile-view"
-            onClick={() => setMobileOpen(false)}
-            className={cn(
-              "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
-              location.pathname === '/mobile-view'
-                ? "bg-sidebar-accent text-sidebar-primary"
-                : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              !sidebarOpen && "justify-center px-2"
-            )}
-          >
-            <Smartphone className="w-5 h-5 flex-shrink-0" />
-            {sidebarOpen && <span className="animate-fade-in">Mobile View</span>}
-          </Link>
         </nav>
 
         {/* Bottom */}
